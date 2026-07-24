@@ -2,86 +2,91 @@
 
 ## Overview
 
-Fast-Search Suggestion System is a Trie-based search engine developed in C++. It enables efficient word lookup and autocomplete suggestions by leveraging the Prefix Tree (Trie) data structure.
+A Trie-based (Prefix Tree) fast search and autocomplete engine built in C++, designed to manage and query a civil-construction material lexicon with instant prefix lookup.
 
 ## Problem Statement
 
-Modern search engines and dictionaries require fast retrieval of words and intelligent autocomplete functionality. This project implements a Trie-based indexing mechanism to support efficient prefix matching and word search operations.
+Managing large material and terminology datasets in civil engineering workflows requires fast exact-match search as well as autocomplete-style suggestions as a user types a partial term. This project implements a Trie-based indexing mechanism to support both operations efficiently, independent of dataset size.
 
 ## Features
 
-* Fast word insertion and retrieval
-* Prefix-based autocomplete suggestions
-* Trie (Prefix Tree) implementation
-* Efficient dictionary management
-* Dynamic memory allocation using pointers
+- Fast word insertion and exact-match retrieval
+- **Full autocomplete**: returns every word in the dictionary matching a given prefix (not just a yes/no availability check)
+- Trie (Prefix Tree) implementation using a fixed 26-pointer array per node
+- Dynamic memory allocation and pointer-based tree construction
+- Recursive memory cleanup (destructor) to avoid leaks
+- Sample civil-construction material lexicon (cement, concrete, aggregate, bitumen, girder, grout, etc.)
 
 ## Technologies Used
 
-* C++
-* Trie Data Structure
-* Pointers
-* Strings
-* Dynamic Memory Management
+- C++
+- Trie / Prefix Tree data structure
+- Pointers and dynamic memory management
+- Recursion (DFS) for suggestion collection
 
 ## Project Structure
 
-```text
-Fast-Search-Suggestion-System/
+```
+Fast-Search-Dictionary-Trie/
 │
 ├── main.cpp
-├── README.md
-├── sample_words.txt
-└── sample_output.txt
+└── README.md
 ```
 
 ## Example
 
-### Inserted Words
+### Inserted Words (sample lexicon)
 
-```text
-cement
-concrete
-column
-beam
-bridge
-brick
+```
+cement, concrete, concreting, column, conduit,
+beam, bridge, brick, bitumen, boulder,
+gravel, girder, grout, granite,
+steel, sand, slab, sealant,
+asphalt, aggregate, admixture
 ```
 
-### Search Queries
+### Search & Autocomplete Queries
 
-```text
-Search: concrete
-Result: Found
+```
+Search 'concrete': Found
+Search 'con': Not Found (exists only as a prefix, not a complete word)
 
-Prefix: con
-Suggestions Available
+Autocomplete suggestions for 'con': concrete, concreting, conduit
+Autocomplete suggestions for 'b': beam, bitumen, boulder, brick, bridge
+Autocomplete suggestions for 'gr': granite, gravel, grout
+Autocomplete suggestions for 'xyz': None
 ```
 
-## Time Complexity
+## Time & Space Complexity
 
-| Operation     | Complexity |
-| ------------- | ---------- |
-| Insert        | O(L)       |
-| Search        | O(L)       |
-| Prefix Search | O(L)       |
+| Operation            | Time Complexity | Notes |
+| --------------------- | ---------------- | ----- |
+| Insert                | O(L)             | L = length of word |
+| Exact Search          | O(L)             | Independent of dictionary size |
+| Prefix Check          | O(L)             | |
+| Autocomplete (getSuggestions) | O(P + K) | P = prefix length, K = total characters across matches |
 
-where L is the length of the word.
+**Space:** O(26 × N × L) worst case, since every node reserves a fixed 26-pointer array regardless of actual branching. A hashmap-per-node design would trade a small time cost for lower memory use on sparse branches — noted as a possible optimization.
+
+## Design Notes / Trade-offs
+
+- A Trie was chosen over a hash map because hash maps cannot efficiently answer prefix queries ("all words starting with X") — Tries support this natively by sharing prefix paths.
+- The fixed-size array (26 children per node) assumes lowercase English letters only; extending to mixed case, digits, or Unicode would require switching to a map-based child structure.
+- Word deletion is not yet implemented; a full implementation would unmark `isEndOfWord` and optionally prune now-empty branches.
 
 ## Future Enhancements
 
-* Ranking suggestions based on frequency
-* Spell correction support
-* Case-insensitive search
-* File-based dictionary loading
-* Large-scale dataset integration
+- Frequency-based ranking of suggestions (store a hit-count per word, return the most-searched matches first)
+- Case-insensitive search
+- Word deletion support
+- File-based dictionary loading for larger, real-world material datasets
 
 ## Learning Outcomes
 
-* Trie (Prefix Tree) implementation
-* Efficient string searching techniques
-* Pointer manipulation and memory management
-* Time complexity optimization
+- Trie (Prefix Tree) implementation and its trade-offs vs. hash maps/BSTs
+- Efficient prefix-based string searching
+- Pointer manipulation, dynamic memory allocation, and manual memory cleanup
+- Time/space complexity analysis of tree-based data structures
 
 ## Author
 
