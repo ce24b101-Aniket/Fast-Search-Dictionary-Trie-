@@ -1,92 +1,530 @@
-# Fast-Search Suggestion System
+# ⚡ fastsearch
 
-## Overview
+> A Trie-backed autocomplete and dictionary management engine built with **C++**, **SQLite**, **React**, and **Docker**.
 
-A Trie-based (Prefix Tree) fast search and autocomplete engine built in C++, designed to manage and query a civil-construction material lexicon with instant prefix lookup.
+FastSearch is a full-stack dictionary and autocomplete application designed around a **Trie data structure** for efficient prefix-based search.
 
-## Problem Statement
+Type a prefix and FastSearch walks the Trie to provide matching words instantly, while the backend handles dictionary operations, search history, and persistent storage.
 
-Managing large material and terminology datasets in civil engineering workflows requires fast exact-match search as well as autocomplete-style suggestions as a user types a partial term. This project implements a Trie-based indexing mechanism to support both operations efficiently, independent of dataset size.
+---
 
-## Features
+## 📸 Screenshots
 
-- Fast word insertion and exact-match retrieval
-- **Full autocomplete**: returns every word in the dictionary matching a given prefix (not just a yes/no availability check)
-- Trie (Prefix Tree) implementation using a fixed 26-pointer array per node
-- Dynamic memory allocation and pointer-based tree construction
-- Recursive memory cleanup (destructor) to avoid leaks
-- Sample civil-construction material lexicon (cement, concrete, aggregate, bitumen, girder, grout, etc.)
+### 🔎 Search Interface
 
-## Technologies Used
+The main search interface allows users to enter a word or prefix and explore the dictionary.
+
+![FastSearch Search Interface](docs/screenshots/search.png)
+
+---
+
+### ⚡ Trie-Based Autocomplete
+
+Type a prefix such as `con` and FastSearch traverses the Trie to return matching words.
+
+![FastSearch Autocomplete Suggestions](docs/screenshots/suggestions.png)
+
+---
+
+### 🛠️ Dictionary Management
+
+The management interface allows words to be added and existing words to be looked up or managed.
+
+![FastSearch Dictionary Management](docs/screenshots/manage.png)
+
+---
+
+## ✨ Features
+
+- ⚡ **Trie-based autocomplete** for fast prefix searching
+- 🔎 **Prefix traversal** with visual feedback
+- 📚 **Dictionary management** through the web interface
+- ➕ Add new words to the dictionary
+- 🔍 Look up existing words
+- 💾 **SQLite-based persistent storage**
+- 📊 Search and dictionary analytics
+- 🌐 REST API powered by the C++ backend
+- 🖥️ React-based frontend
+- 🚀 Production frontend served using Nginx
+- 🐳 Fully containerized using Docker
+- 🔄 Docker Compose orchestration for frontend and backend
+- 💽 Persistent Docker volume for dictionary data
+- 🧩 Modular C++ architecture using CMake
+
+---
+
+## 🏗️ Architecture
+
+```text
+                        ┌───────────────────────┐
+                        │       Browser         │
+                        │   React Web Interface │
+                        └───────────┬───────────┘
+                                    │
+                                    │ HTTP
+                                    ▼
+                        ┌───────────────────────┐
+                        │       Frontend        │
+                        │    React + Vite       │
+                        │        Nginx          │
+                        └───────────┬───────────┘
+                                    │
+                                    │ REST API
+                                    ▼
+                  ┌─────────────────────────────────┐
+                  │          C++ Backend            │
+                  │                                 │
+                  │  API → Service → Trie / DB     │
+                  └───────────────┬─────────────────┘
+                                  │
+                    ┌─────────────┴─────────────┐
+                    │                           │
+                    ▼                           ▼
+             ┌──────────────┐           ┌──────────────┐
+             │     Trie     │           │    SQLite    │
+             │              │           │   Database   │
+             │ Prefix Search│           │              │
+             └──────────────┘           └──────────────┘
+```
+
+---
+
+## 🧠 Core Idea — Trie-Based Autocomplete
+
+The core search engine uses a **Trie**, also known as a prefix tree.
+
+Instead of scanning every dictionary word for every query, the search process follows the characters of the supplied prefix through the Trie.
+
+For example:
+
+```text
+Prefix: con
+
+        root
+          │
+          c
+          │
+          o
+          │
+          n
+       ┌──┼──┐
+       │  │  │
+    concrete
+    concreting
+    conduit
+```
+
+Once the node representing `con` is reached, the engine can explore the subtree below that node to find matching words.
+
+This makes the data structure particularly suitable for **autocomplete and prefix-based search**.
+
+---
+
+## 🔄 Search Flow
+
+```text
+User enters prefix
+        │
+        ▼
+Frontend sends API request
+        │
+        ▼
+C++ REST API
+        │
+        ▼
+Search Service
+        │
+        ▼
+Trie traversal
+        │
+        ▼
+Matching words
+        │
+        ▼
+Frontend displays suggestions
+```
+
+---
+
+## 🧩 Project Structure
+
+```text
+Deployable/
+│
+├── Dockerfile
+├── docker-compose.yml
+├── CMakeLists.txt
+├── README.md
+│
+├── db/
+│   └── ...
+│
+├── docs/
+│   ├── ...
+│   └── screenshots/
+│       ├── search.png
+│       ├── suggestions.png
+│       └── manage.png
+│
+├── frontend/
+│   ├── ...
+│   ├── package.json
+│   └── ...
+│
+├── src/
+│   ├── api/
+│   ├── core/
+│   ├── db/
+│   ├── service/
+│   └── main.cpp
+│
+├── tests/
+│   └── ...
+│
+└── third_party/
+    └── ...
+```
+
+### Backend modules
+
+The C++ backend is organized into separate components:
+
+- **Core** — Trie and text normalization logic
+- **Database** — SQLite database management and repositories
+- **Service** — Search and application logic
+- **API** — HTTP/API layer
+- **Main** — Backend application entry point
+
+---
+
+## 🛠️ Tech Stack
+
+### Backend
+
+- **C++**
+- **CMake**
+- **SQLite**
+- REST API
+- Trie data structure
+
+### Frontend
+
+- **React**
+- **TypeScript**
+- **Vite**
+- **Nginx**
+
+### DevOps / Deployment
+
+- **Docker**
+- **Docker Compose**
+- **WSL 2**
+- Persistent Docker volumes
+
+---
+
+## 🚀 Running the Project Locally
+
+### Prerequisites
+
+Make sure you have:
+
+- Docker Desktop
+- WSL 2 on Windows
+- Git
+
+Docker Desktop must be running before starting the application.
+
+---
+
+### 1. Clone the repository
+
+```bash
+git clone <your-repository-url>
+cd <repository-directory>/Deployable
+```
+
+---
+
+### 2. Build and start the application
+
+From the `Deployable` directory:
+
+```bash
+docker compose up --build
+```
+
+The first build may take a few minutes because Docker needs to build both the C++ backend and frontend images.
+
+---
+
+### 3. Open the application
+
+Once the containers are running, open:
+
+```text
+http://localhost:5173
+```
+
+The FastSearch web interface should appear.
+
+---
+
+### 4. Check the backend
+
+The backend health endpoint is available at:
+
+```text
+http://localhost:8080/api/health
+```
+
+A successful response should indicate that the backend is healthy.
+
+---
+
+## 🐳 Docker Services
+
+The application is divided into two primary containers:
+
+```text
+┌──────────────────────────┐
+│   fastsearch-frontend    │
+│                          │
+│ React + Vite + Nginx     │
+│        :5173             │
+└────────────┬─────────────┘
+             │
+             │ API requests
+             ▼
+┌──────────────────────────┐
+│    fastsearch-backend    │
+│                          │
+│ C++ REST API             │
+│        :8080             │
+└────────────┬─────────────┘
+             │
+             ▼
+┌──────────────────────────┐
+│     SQLite Database      │
+│                          │
+│ Persistent Docker Volume │
+└──────────────────────────┘
+```
+
+---
+
+## 💾 Data Persistence
+
+FastSearch uses a named Docker volume for persistent application data.
+
+This means dictionary data can survive container restarts.
+
+To stop the application:
+
+```bash
+Ctrl + C
+```
+
+Then:
+
+```bash
+docker compose down
+```
+
+Start it again with:
+
+```bash
+docker compose up
+```
+
+The persistent data remains available because the named volume is preserved.
+
+> **Important:** Avoid `docker compose down -v` if you want to preserve the database volume.
+
+---
+
+## 🔌 API
+
+The backend exposes HTTP endpoints used by the frontend for dictionary and search operations.
+
+The health endpoint can be used to verify that the backend is running:
+
+```text
+GET /api/health
+```
+
+Base backend URL:
+
+```text
+http://localhost:8080
+```
+
+The frontend communicates with the backend through the configured API endpoints.
+
+---
+
+## 📖 Example
+
+Suppose the dictionary contains:
+
+```text
+concrete
+concreting
+conduit
+```
+
+The user enters:
+
+```text
+con
+```
+
+The Trie traversal follows:
+
+```text
+root
+  ↓
+ c
+  ↓
+ o
+  ↓
+ n
+```
+
+The application then returns matching words:
+
+```text
+concrete
+concreting
+conduit
+```
+
+The suggestions are displayed directly in the frontend.
+
+---
+
+## ⚙️ Building the Backend Manually
+
+The backend uses CMake.
+
+A typical build process is:
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+```
+
+The Docker build performs the backend compilation automatically.
+
+---
+
+## 🧪 Testing
+
+The repository contains a `tests/` directory for project tests.
+
+The Docker production build disables the test target when building the server image:
+
+```text
+- DFASTSEARCH_BUILD_TESTS=OFF
+```
+
+Tests can be built separately when working on the project locally.
+
+---
+
+## 📊 Analytics
+
+FastSearch also includes an **Analytics** section in the web interface for inspecting application/search-related information.
+
+The application therefore provides three main user-facing areas:
+
+```text
+Search
+Manage
+Analytics
+```
+
+---
+
+## 🔐 Design Goals
+
+FastSearch was designed with the following goals:
+
+- Efficient prefix-based searching
+- Clean separation between frontend and backend
+- Persistent dictionary storage
+- Modular C++ architecture
+- Containerized deployment
+- Easy local setup
+- Extensible API architecture
+
+---
+
+## 🚀 Future Improvements
+
+Possible future enhancements include:
+
+- [ ] Ranking suggestions by popularity or frequency
+- [ ] Fuzzy / typo-tolerant search
+- [ ] Improved search analytics
+- [ ] Authentication and user-specific dictionaries
+- [ ] Larger dictionary datasets
+- [ ] More comprehensive automated tests
+- [ ] API documentation
+- [ ] Performance benchmarking for large Trie datasets
+- [ ] CI/CD pipeline
+- [ ] Cloud deployment
+
+---
+
+## 🎯 What This Project Demonstrates
+
+This project brings together several important software engineering concepts:
+
+### Data Structures
+
+- Trie
+- Tree traversal
+- Prefix searching
+
+### Backend Engineering
 
 - C++
-- Trie / Prefix Tree data structure
-- Pointers and dynamic memory management
-- Recursion (DFS) for suggestion collection
+- Modular architecture
+- REST APIs
+- Service/repository separation
 
-## Project Structure
+### Database
 
-```
-Fast-Search-Dictionary-Trie/
-│
-├── main.cpp
-└── README.md
-```
+- SQLite
+- Persistent storage
+- Repository pattern
 
-## Example
+### Frontend
 
-### Inserted Words (sample lexicon)
+- React
+- TypeScript
+- Vite
+- Responsive application interface
 
-```
-cement, concrete, concreting, column, conduit,
-beam, bridge, brick, bitumen, boulder,
-gravel, girder, grout, granite,
-steel, sand, slab, sealant,
-asphalt, aggregate, admixture
-```
+### DevOps
 
-### Search & Autocomplete Queries
+- Docker
+- Docker Compose
+- Multi-stage Docker builds
+- Nginx
+- Persistent volumes
+- WSL 2
 
-```
-Search 'concrete': Found
-Search 'con': Not Found (exists only as a prefix, not a complete word)
+---
 
-Autocomplete suggestions for 'con': concrete, concreting, conduit
-Autocomplete suggestions for 'b': beam, bitumen, boulder, brick, bridge
-Autocomplete suggestions for 'gr': granite, gravel, grout
-Autocomplete suggestions for 'xyz': None
-```
+## 👨‍💻 Project
 
-## Time & Space Complexity
+**fastsearch** — a full-stack Trie-powered autocomplete and dictionary management system.
 
-| Operation            | Time Complexity | Notes |
-| --------------------- | ---------------- | ----- |
-| Insert                | O(L)             | L = length of word |
-| Exact Search          | O(L)             | Independent of dictionary size |
-| Prefix Check          | O(L)             | |
-| Autocomplete (getSuggestions) | O(P + K) | P = prefix length, K = total characters across matches |
+Built to explore efficient data structures, backend architecture, persistent storage, and containerized application deployment.
 
-**Space:** O(26 × N × L) worst case, since every node reserves a fixed 26-pointer array regardless of actual branching. A hashmap-per-node design would trade a small time cost for lower memory use on sparse branches — noted as a possible optimization.
-
-## Design Notes / Trade-offs
-
-- A Trie was chosen over a hash map because hash maps cannot efficiently answer prefix queries ("all words starting with X") — Tries support this natively by sharing prefix paths.
-- The fixed-size array (26 children per node) assumes lowercase English letters only; extending to mixed case, digits, or Unicode would require switching to a map-based child structure.
-- Word deletion is not yet implemented; a full implementation would unmark `isEndOfWord` and optionally prune now-empty branches.
-
-## Future Enhancements
-
-- Frequency-based ranking of suggestions (store a hit-count per word, return the most-searched matches first)
-- Case-insensitive search
-- Word deletion support
-- File-based dictionary loading for larger, real-world material datasets
-
-## Learning Outcomes
-
-- Trie (Prefix Tree) implementation and its trade-offs vs. hash maps/BSTs
-- Efficient prefix-based string searching
-- Pointer manipulation, dynamic memory allocation, and manual memory cleanup
-- Time/space complexity analysis of tree-based data structures
+---
 
 ## Author
 
