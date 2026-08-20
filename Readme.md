@@ -1,85 +1,81 @@
-# FastSearch — Trie-Based Intelligent Dictionary & Autocomplete Engine
+# FastSearch — Trie-Based Dictionary & Autocomplete Engine
 
-A prefix-tree search engine built with **C++20**, exposed through a REST API, backed by SQLite, and paired with a React/TypeScript frontend.
+A full-stack dictionary search application built with **C++20**, **SQLite**, **React**, **TypeScript**, and **Docker**.
 
-FastSearch was built as a personal portfolio project to demonstrate practical knowledge of data structures and algorithms, backend engineering, REST APIs, databases, Docker, and full-stack application architecture.
+FastSearch uses a **Trie (Prefix Tree)** as its in-memory search index to provide efficient prefix matching and autocomplete. It began as a console-based data-structures project and evolved into a containerized web application with a REST API, persistent storage, and a responsive frontend.
 
-The project evolved from a single-file console Trie demo into a complete application with persistent storage, autocomplete search, and a web interface.
+## Highlights
+
+- Trie-based prefix search and autocomplete
+- REST API built in C++
+- Persistent SQLite dictionary and search-history storage
+- React + TypeScript frontend
+- Docker Compose setup for the complete application
+- Layered backend architecture with clear separation of concerns
+- Automated backend tests
 
 ## Project Showcase
 
 ### Search Interface
 
-Search the dictionary through a simple, responsive interface.
+A clean interface for searching dictionary words and prefixes.
 
-![FastSearch Search Interface](docs/screenshots/search.png)
+![FastSearch Search Interface](Deployable/docs/screenshots/search.png)
 
 ### Trie-Based Autocomplete
 
-As a user enters a prefix, FastSearch searches the in-memory Trie and returns matching word suggestions.
+As the user enters a prefix, FastSearch traverses the Trie and returns matching suggestions.
 
-![FastSearch Autocomplete Suggestions](docs/screenshots/suggestions.png)
+![FastSearch Autocomplete Suggestions](Deployable/docs/screenshots/suggestions.png)
 
 ### Dictionary Management
 
-Add, look up, and manage dictionary words through the administration interface.
+Add, search for, and manage dictionary words through the administration interface.
 
-![FastSearch Dictionary Management](docs/screenshots/manage.png)
-
-> Screenshot files must be saved using these exact names:
->
-> ```text
-> docs/screenshots/search.png
-> docs/screenshots/suggestions.png
-> docs/screenshots/manage.png
-> ```
+![FastSearch Dictionary Management](Deployable/docs/screenshots/manage.png)
 
 ## Architecture
 
 ```text
-React (Vite/TypeScript) --HTTP--> REST API (C++, httplib) --> SearchService
-                                                                  |-- Trie (in-memory index)
-                                                                  |-- WordRepository (SQLite)
-                                                                  |-- SearchHistoryRepository (SQLite)
+React (Vite + TypeScript)
+            |
+            | HTTP
+            v
+REST API (C++ + cpp-httplib)
+            |
+            v
+      SearchService
+       /           \
+      v             v
+Trie Search Index   SQLite Repositories
+                    ├── WordRepository
+                    └── SearchHistoryRepository
 ```
 
-The Trie is the primary search index at request time. SQLite is the source of truth on disk, and the Trie is rebuilt from it on every startup.
-
-## Features
-
-- Trie-based prefix search and autocomplete
-- C++ REST API for dictionary and search operations
-- SQLite persistence for dictionary data and search history
-- React and TypeScript frontend
-- Docker Compose setup for backend, frontend, and persistent data
-- Layered architecture separating core logic, storage, services, and API routes
-- Automated backend tests
-- Persistent Docker volume for database data
+SQLite is the persistent source of truth. On startup, the application loads the dictionary data from SQLite and rebuilds the in-memory Trie for fast search operations.
 
 ## Tech Stack
 
 | Area | Technologies |
 |---|---|
 | Backend | C++20, CMake, cpp-httplib, nlohmann/json |
-| Core data structure | Trie / Prefix Tree |
+| Data structure | Trie / Prefix Tree |
 | Database | SQLite |
 | Frontend | React, TypeScript, Vite |
 | Testing | GoogleTest |
-| Deployment setup | Docker, Docker Compose, Nginx |
+| Containerization | Docker, Docker Compose, Nginx |
 
-## Prerequisites
+## Quick Start with Docker
 
-To run the project locally, install:
+### Prerequisites
 
-- Docker Desktop and Docker Compose for the Docker setup
-- CMake and a C++20-compatible compiler for backend development
-- Node.js and npm for frontend development
+- Docker Desktop
+- Docker Compose
 
-## Run with Docker
-
-Docker is the recommended way to run the complete application.
+From the repository root, run:
 
 ```bash
+cd Deployable
 docker compose up --build
 ```
 
@@ -95,29 +91,25 @@ The health endpoint should return:
 {"status":"ok"}
 ```
 
-The SQLite database is stored in a named Docker volume named `fastsearch_data`.
+To stop the application while keeping the database data:
 
 ```bash
 docker compose down
 ```
 
-This stops the application while preserving dictionary data.
+To stop the application and reset the stored database:
 
 ```bash
 docker compose down -v
 ```
 
-This stops the application and removes the stored database volume, resetting it to the seed dataset on the next run.
+> The SQLite database is stored in the named Docker volume `fastsearch_data`.
 
-To connect the frontend to a non-local backend, rebuild it with:
-
-```bash
-docker compose build --build-arg VITE_API_BASE_URL=https://api.yourdomain.com frontend
-```
-
-## Run Without Docker
+## Local Development
 
 ### Backend
+
+From the `Deployable` directory:
 
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -128,82 +120,61 @@ cmake --build build -j
 
 ### Frontend
 
-Open a separate terminal:
+Open a second terminal:
 
 ```bash
-cd frontend
+cd Deployable/frontend
 npm install
 npm run dev
 ```
 
 The frontend will be available at <http://localhost:5173>.
-![FastSearch Search Interface](Deployable/docs/screenshots/search.png)
 
-![FastSearch Autocomplete Suggestions](Deployable/docs/screenshots/suggestions.png)
-
-![FastSearch Dictionary Management](Deployable/docs/screenshots/manage.png)
-
-## Project Layout
+## Project Structure
 
 ```text
-CMakeLists.txt           # Backend build configuration
-Dockerfile               # Backend Docker image
-docker-compose.yml       # Backend + frontend + persistent volume
-
-src/
-  core/                  # Trie, TrieNode, Normalizer; no HTTP or DB knowledge
-  db/                    # DatabaseManager, WordRepository, SearchHistoryRepository
-  service/               # SearchService; coordinates Trie and database operations
-  api/                   # REST routes using httplib and nlohmann/json
-  main.cpp               # Startup: load database, build Trie, start server
-
-tests/                   # GoogleTest test suite
-third_party/             # Vendored dependencies
-
-frontend/
-  src/
-    lib/                 # Typed API client and debounce hook
-    components/          # SearchBar, TriePath, ResultPanel
-    pages/               # SearchPage, AdminPage, DashboardPage
-  Dockerfile             # Frontend Docker image
-  nginx.conf             # Nginx configuration
-
-docs/
-  screenshots/           # README project screenshots
+Fast-search project/
+├── Deployable/
+│   ├── CMakeLists.txt           # Backend build configuration
+│   ├── Dockerfile               # Backend Docker image
+│   ├── docker-compose.yml       # Backend + frontend + persistent volume
+│   ├── src/
+│   │   ├── core/                # Trie, TrieNode, Normalizer
+│   │   ├── db/                  # SQLite database and repositories
+│   │   ├── service/             # SearchService business logic
+│   │   ├── api/                 # REST API routes
+│   │   └── main.cpp             # Application startup
+│   ├── tests/                   # GoogleTest suite
+│   ├── frontend/                # React + TypeScript application
+│   └── docs/screenshots/        # README screenshots
+├── Fullstack/
+├── Phase1/
+└── Phase2/
 ```
 
-## Technical Concepts Demonstrated
+## Concepts Demonstrated
 
 - Trie / Prefix Tree implementation
-- Prefix-based autocomplete and word lookup
-- C++20 development
+- Prefix-based autocomplete and lookup
+- C++20 application development
 - REST API design
-- SQLite database persistence
+- SQLite persistence
 - Repository and service-layer patterns
 - React and TypeScript frontend development
-- Docker and Docker Compose
-- Separation of concerns and layered software architecture
+- Docker-based local deployment
 - Automated testing with GoogleTest
+- Layered software architecture
 
-## Status
+## Future Improvements
 
-The backend, including the Trie, autocomplete/ranking, SQLite persistence, REST API, and frontend, is implemented and tested.
-
-Docker configuration and images are included. Run the following command on a machine with normal Docker Hub access to build and start the full application:
-
-```bash
-docker compose up --build
-```
-
-## Planned Improvements
-
-- CI pipeline
-- Benchmark suite
-- Expanded project documentation
+- Continuous integration pipeline
+- Search-performance benchmark suite
+- Expanded API documentation
 - Interview-oriented architecture notes
+- Additional search ranking and filtering options
 
 ## Author
 
 Built by **Aniket Raval** as a personal software engineering portfolio project.
 
-The goal of FastSearch is to showcase the progression from implementing a core data structure to designing and building a complete, containerized full-stack application.
+FastSearch demonstrates the journey from implementing a core data structure to designing and building a complete, persistent, containerized full-stack application.
