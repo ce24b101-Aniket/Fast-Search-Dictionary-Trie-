@@ -137,6 +137,11 @@ npm run dev
 ```
 
 The frontend will be available at <http://localhost:5173>.
+![FastSearch Search Interface](Deployable/docs/screenshots/search.png)
+
+![FastSearch Autocomplete Suggestions](Deployable/docs/screenshots/suggestions.png)
+
+![FastSearch Dictionary Management](Deployable/docs/screenshots/manage.png)
 
 ## Project Layout
 
