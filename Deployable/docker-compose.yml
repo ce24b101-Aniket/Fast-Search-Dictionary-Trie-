@@ -1,0 +1,44 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastsearch-backend
+    ports:
+      - "8080:8080"
+    volumes:
+      # Named volume, NOT a bind mount -- the SQLite file lives inside
+      # Docker's managed storage and survives `docker compose down`
+      # (though not `docker compose down -v`). This is the persistence
+      # layer from Phase 4 actually mattering at deployment time: kill
+      # and recreate the container, the dictionary is still there.
+      - fastsearch_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        # Browser-side fetches hit the HOST's published port, not the
+        # backend container's internal Docker-network address -- the
+        # browser making the request runs on the host machine, outside
+        # the Compose network entirely, so "backend:8080" (the
+        # container-to-container hostname) would not resolve for it.
+        VITE_API_BASE_URL: http://localhost:8080
+    container_name: fastsearch-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  fastsearch_data:

@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+/*
+  FastSearch design tokens.
+
+  Palette: deliberately near-black navy rather than pure black or the
+  cream/terracotta look, paired with an electric blue (the "cursor"
+  color -- it's what lights up as you type, standing in for the active
+  Trie traversal) and a warm amber as a secondary accent for
+  frequency/rank data, so the page doesn't collapse into a single-accent
+  look. Text is a soft off-white, never pure #fff, to keep contrast from
+  feeling harsh at this depth of background.
+
+  Type: monospace for anything that IS data (the logo, suggestion words,
+  frequency numbers, latency figures) since the product's subject matter
+  literally is character-by-character structure; a plain system sans for
+  prose/labels so paragraphs stay readable. Both are OS-native stacks --
+  deliberate, not a fallback of convenience: a search tool for engineers
+  should feel native to a terminal, not styled to look like one via a
+  webfont.
+*/
+:root {
+  --bg: #0a0e14;
+  --bg-raised: #10151d;
+  --bg-inset: #060a0f;
+  --border: #1e2733;
+  --border-hover: #2c3847;
+
+  --text: #e7ecf2;
+  --text-dim: #8b98a8;
+  --text-faint: #566072;
+
+  --accent: #4fb8e8;
+  --accent-dim: #2c6f8c;
+  --accent-glow: rgba(79, 184, 232, 0.35);
+
+  --amber: #e0a458;
+  --amber-dim: #8a6a3f;
+
+  --danger: #e06a6a;
+  --success: #5cc98f;
+
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono",
+    Consolas, monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+    sans-serif;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent-glow);
+  color: var(--text);
+}
+
+/* Visible keyboard focus everywhere -- never suppressed. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+.font-mono-tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}

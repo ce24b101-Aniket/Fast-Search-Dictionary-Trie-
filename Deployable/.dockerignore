@@ -1,0 +1,9 @@
+build/
+frontend/node_modules/
+frontend/dist/
+.git/
+*.db
+*.db-*
+docs/
+tests/
+db/
